@@ -1,18 +1,32 @@
 from CloudFlare import CloudFlare
 import requests
+import json
 
 """ 
 Update your DNS record in CloudFlare with your Home IP  
 """
 
+def get_config():
+    try:
+        # Open the config.json file in read mode
+        with open('config.json', 'r') as f:
+            
+            # Load the JSON data from the file
+            config = json.load(f)
+
+            # Return the values as a dictionary
+            return config
+    except Exception as e:
+        print(f'An issue occured trying to open the configuration file: {e}')
+
 def main():
     try:
-        # Set your domain name and record name
-        zone_name = 'example.com'
-        record_name = 'home.example.com'
-        # Set your Cloudflare API key and email
-        email='your-email@example.com'
-        token='your-api-key'
+        # Call the get_config function and assign the values to variables
+        config = get_config()
+        zone_name = config['zone_name']
+        record_name = config['record_name']
+        email = config['email']
+        token = config['token']
 
         cf = CloudFlare(email=email,token=token)
 
