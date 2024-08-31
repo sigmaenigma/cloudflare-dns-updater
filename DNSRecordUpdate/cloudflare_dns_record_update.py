@@ -113,6 +113,8 @@ def main():
             current_public_ip = get_current_public_ip()
             zone_data = get_zone_data()
             update_ip_in_cloudflare(current_public_ip=current_public_ip, zone_data=zone_data,force=True)
+        else:
+            print('An issue occured with Authentication. Is the token typed out or set up correctly?')
         print(f'Complete... ')
     except Exception as e:
         print(f'An issue occured trying to update the CloudFlare DNS Record: {e}')
