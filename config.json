@@ -1,6 +1,6 @@
 {
-    "zone_name": "example.com",
+    "zone_name": "1234567890ABCDEFGHIJKLMNOPQRSTUV",
     "record_name": "home.example.com",
     "email": "your-email@example.com",
-    "token": "your-api-key"
+    "token": "1234567890ABCDEFGHIJKLMNOPQRSTUV"
 }
