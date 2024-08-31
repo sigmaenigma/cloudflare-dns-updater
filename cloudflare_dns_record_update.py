@@ -20,7 +20,7 @@ def get_verify_api():
     try:
         url = f"https://api.cloudflare.com/client/v4/user/tokens/verify"
         headers = get_headers()
-        verify_url_response = requests.request("GET", url=url, headers=headers)
+        verify_url_response = requests.get(url=url, headers=headers)
         if "result" in verify_url_response.json():
             if verify_url_response.json()['result']['status'] == 'active':
                 return True
@@ -64,9 +64,10 @@ def update_ip_in_cloudflare(current_public_ip, cloudflare_ip, name, id, zone_id,
                 "ttl": 3600
             }
             response = requests.patch(url=url, json=payload, headers=headers)
-            print(response.json())
             if response.status_code != 200:
                 print(f'Update Failed: {response.json()}')
+            else:
+                print(f'IP Successfully updated in CloudFlare!!!')
             return response
         else:
             print(f'The IP Addresses are the same. Not updating')
@@ -91,7 +92,7 @@ def get_zone_data():
         zone_name = config['zone_name']
         record_name = config['record_name']
         url = f"https://api.cloudflare.com/client/v4/zones/{zone_name}/dns_records?name={record_name}"
-        response = requests.request("GET", url=url, headers=headers).json()
+        response = requests.get(url=url, headers=headers).json()
         result = response["result"][0]
         return result
     except Exception as e:
@@ -106,15 +107,14 @@ def main():
             print(f'Token active... continuing... ')
             current_public_ip = get_current_public_ip()
             zone_data = get_zone_data()
-            update_result = update_ip_in_cloudflare(
+            update_ip_in_cloudflare(
                 current_public_ip=current_public_ip, 
                 cloudflare_ip=zone_data["content"], 
                 name=zone_data["name"], 
                 id=zone_data["id"], 
                 zone_id=zone_data["zone_id"],
-                force=False
+                force=True
                 )
-            print(update_result)
         print(f'Complete... ')
     except Exception as e:
         print(f'An issue occured trying to update the CloudFlare DNS Record: {e}')
