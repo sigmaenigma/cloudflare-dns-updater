@@ -108,8 +108,7 @@ def get_zone_data():
 def main():
     try:
         print(f'Starting... ')
-        verify_url_response = get_verify_api()
-        if verify_url_response:
+        if get_verify_api():
             print(f'Token active... continuing... ')
             current_public_ip = get_current_public_ip()
             zone_data = get_zone_data()
