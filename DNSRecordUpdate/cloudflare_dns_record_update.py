@@ -19,7 +19,7 @@ def get_config():
             config = json.load(f)
             return config
     except Exception as e:
-        print(f'An issue occured trying to open the configuration file: {e}')
+        print(f'An issue occurred trying to open the configuration file: {e}')
 
 def get_verify_api():
     """ Verifies the Token works and returns True if it does """
@@ -35,7 +35,7 @@ def get_verify_api():
         else:
             return False
     except Exception as e:
-        print(f'An issue occured with get_verify_api(): {e}')
+        print(f'An issue occurred with get_verify_api(): {e}')
         return False
 
 def get_headers():
@@ -48,7 +48,7 @@ def get_headers():
         }
         return headers
     except Exception as e:
-        print(f'An issue occured getting headers: {e}')
+        print(f'An issue occurred getting headers: {e}')
         return False
 
 def update_ip_in_cloudflare(current_public_ip, zone_data):
@@ -85,7 +85,7 @@ def update_ip_in_cloudflare(current_public_ip, zone_data):
             print(f'The IP Addresses are the same. Not updating')
             return True
     except Exception as e:
-        print(f'An issue occured updating CloudFlare with the current IP: {e}')
+        print(f'An issue occurred updating CloudFlare with the current IP: {e}')
         return False
 
 def get_current_public_ip():
@@ -94,7 +94,7 @@ def get_current_public_ip():
         ip = requests.get('https://api.ipify.org').text
         return ip
     except Exception as e:
-        print(f'An issue occured trying to get the current public IP: {e}')
+        print(f'An issue occurred trying to get the current public IP: {e}')
 
 def get_zone_data():
     """ Pulls Zone data to be used in other functions """
@@ -110,7 +110,7 @@ def get_zone_data():
         result = json_response["result"][0]
         return result
     except Exception as e:
-        print(f'An issue occured trying to get the zone data: {e}')
+        print(f'An issue occurred trying to get the zone data: {e}')
         return False
 
 def main():
@@ -122,10 +122,10 @@ def main():
             zone_data = get_zone_data()
             update_ip_in_cloudflare(current_public_ip=current_public_ip, zone_data=zone_data)
         else:
-            print('An issue occured with Authentication. Is the token typed out or set up correctly?')
+            print('An issue occurred with Authentication. Is the token typed out or set up correctly?')
         print(f'Complete... ')
     except Exception as e:
-        print(f'An issue occured trying to update the CloudFlare DNS Record: {e}')
+        print(f'An issue occurred trying to update the CloudFlare DNS Record: {e}')
         return False
 
 if __name__ == '__main__':
