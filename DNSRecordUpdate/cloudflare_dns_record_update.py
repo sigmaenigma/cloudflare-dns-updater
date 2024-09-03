@@ -27,11 +27,10 @@ def get_verify_api():
         url = f"https://api.cloudflare.com/client/v4/user/tokens/verify"
         headers = get_headers()
         response = requests.get(url=url, headers=headers)
-        if "result" in response.json():
-            if response.json()['result']['status'] == 'active':
-                return True
-            else:
-                return False
+        json_response = response.json()
+        status = response.json()['result']['status']
+        if "result" in json_response:
+            return True if status == 'active' else False
         else:
             return False
     except Exception as e:
