@@ -119,7 +119,7 @@ def main():
             print(f'Token active... continuing... ')
             current_public_ip = get_current_public_ip()
             zone_data = get_zone_data()
-            update_ip_in_cloudflare(current_public_ip=current_public_ip, zone_data=zone_data,force=True)
+            update_ip_in_cloudflare(current_public_ip=current_public_ip, zone_data=zone_data)
         else:
             print('An issue occured with Authentication. Is the token typed out or set up correctly?')
         print(f'Complete... ')
