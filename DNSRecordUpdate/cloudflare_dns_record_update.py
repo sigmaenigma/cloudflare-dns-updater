@@ -51,14 +51,15 @@ def get_headers():
         print(f'An issue occured getting headers: {e}')
         return False
 
-def update_ip_in_cloudflare(current_public_ip, zone_data, force=False):
+def update_ip_in_cloudflare(current_public_ip, zone_data):
     """ Updates the IP (content) in CloudFlare if a change is detected or the Force flag is enabled for a given domain name """
     try:
         cloudflare_ip = zone_data["content"]
         name          = zone_data["name"]
         id            = zone_data["id"]
         zone_id       = zone_data["zone_id"]
-        if current_public_ip != cloudflare_ip or force == True:
+        force_update  = get_config()["force_update"]
+        if current_public_ip != cloudflare_ip or force_update == True:
             print(f'Updating the CloudFlare IP {cloudflare_ip} with the current public IP: {current_public_ip}')
             current_time = datetime.now()
             headers = get_headers()
