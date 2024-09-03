@@ -2,6 +2,12 @@ import requests
 import json
 from datetime import datetime
 
+__author__ = "Adrian Sanabria-Diaz"
+__license__ = "MIT"
+__version__ = "1.0.0"
+__maintainer__ = "Adrian Sanabria-Diaz"
+__status__ = "Production"
+
 """ 
 Update your DNS record in CloudFlare with your Home IP  
 """
