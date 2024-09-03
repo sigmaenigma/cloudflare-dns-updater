@@ -1,5 +1,6 @@
 {
     "zone_name": "1234567890ABCDEFGHIJKLMNOPQRSTUV",
     "record_name": "home.example.com",
-    "token": "1234567890ABCDEFGHIJKLMNOPQRSTUV"
+    "token": "1234567890ABCDEFGHIJKLMNOPQRSTUV",
+    "force_update":true
 }
