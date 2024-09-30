@@ -2,6 +2,7 @@
 import requests
 import json
 from datetime import datetime
+import socket
 
 __author__ = "Adrian Sanabria-Diaz"
 __license__ = "MIT"
@@ -12,6 +13,13 @@ __status__ = "Production"
 """ 
 Update your DNS record in CloudFlare with your Home IP  
 """
+
+def get_hostname():
+    try:
+        return socket.gethostname()
+    except Exception as e:
+        print(f'An issue occurred trying to get the system hostname: {e}')
+        return e
 
 def get_config():
     """ Opens the JSON config file and returns the contents """
@@ -55,13 +63,14 @@ def update_ip_in_cloudflare(current_public_ip, zone_data):
     """ Updates the IP (content) in CloudFlare if a change is detected or the Force flag is enabled for a given domain name """
     try:
         config = get_config()
+        hostname = get_hostname()
         cloudflare_ip = zone_data["content"]
         name          = zone_data["name"]
         id            = zone_data["id"]
         zone_id       = zone_data["zone_id"]
         force_update  = config["force_update"]
         if current_public_ip != cloudflare_ip or force_update == True:
-            print(f'Updating the CloudFlare IP {cloudflare_ip} with the current public IP: {current_public_ip}')
+            print(f'Updating the CloudFlare IP {cloudflare_ip} with the current public IP: {current_public_ip} from hostname: {hostname}')
             current_time = datetime.now()
             headers = get_headers()
             url = f"https://api.cloudflare.com/client/v4/zones/{zone_id}/dns_records/{id}"
@@ -70,7 +79,7 @@ def update_ip_in_cloudflare(current_public_ip, zone_data):
                 "name":     f"{name}",
                 "proxied":  False,
                 "type":     "A",
-                "comment":  f"IP last updated on {current_time} via API User",
+                "comment":  f"IP last updated on {current_time} via API User from hostname {hostname}",
                 "id":       f"{id}",
                 "tags":     [],
                 "ttl":      3600
