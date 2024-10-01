@@ -13,8 +13,11 @@ The cloudflare_dns_record_update.py Python file can be used to directly update y
 5. You can also manually invoke the app by running `python3 app_manual.py`
 6. Save
 
-# Running
-python3 app.py
+# Running on an Interval
+`python3 app.py`
+
+# Running Once
+`python3 app_manual.py`
 
 # Automation
 Up to you how you want to automate but I recommend a cron job that runs hourly. 
