@@ -1,0 +1,8 @@
+services:
+  cloudflare-updater:
+    build: .
+    volumes:
+      - .:/app
+    environment:
+      - CONFIG_FILE=config.json
+    restart: always
