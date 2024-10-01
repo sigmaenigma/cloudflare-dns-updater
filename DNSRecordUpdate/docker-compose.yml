@@ -1,5 +1,6 @@
 services:
-  cloudflare-updater:
+  cf-dns-updater:
+    container_name: cf-dns-updater
     build: .
     volumes:
       - .:/app
