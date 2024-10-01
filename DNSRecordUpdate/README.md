@@ -7,9 +7,10 @@ By default, the main app `app.py` runs on an interval specified in the [config.j
 1. Get your API token from CloudFlare and make sure the token is able to be used for edits. Add this to the "token".
 2. Get the Zone ID for the domain. This is a 32 digit alphanumeric string. Add this to "zone_name".
 3. Add the full subdomain (e.g. test.example.com) to the "record_name".
-4. Add your interval setting in interval_minutes. For example, set to 15 if you want the script to run every 15 minutes
-5. You can also manually invoke the app by running `python3 app_manual.py`
-6. Save
+4. Force Update should be set to True if you want to bypass the IP comparison check
+5. Add your interval setting in interval_minutes. For example, set to 15 if you want the script to run every 15 minutes
+6. You can also manually invoke the app by running `python3 app_manual.py`
+7. Save
 
 # Installation (Python Standalone)
 1. git clone https://github.com/sigmaenigma/CloudFlare.git
