@@ -15,10 +15,10 @@ By default, the main app `app.py` runs on an interval specified in the [config.j
 5. You can also manually invoke the app by running `python3 app_manual.py`
 6. Save
 
-# Running on an Interval
+# Running on a timed interval (perpetual)
 `python3 app.py`
 
-# Running Once
+# Running manually (exits on completion)
 `python3 app_manual.py`
 
 # Automation
