@@ -1,5 +1,7 @@
 # CloudFlare
-The app.py Python file can be used to directly update your CloudFlare DNS record with the IP Address of your home network. The main app `app.py` runs once and contacts the CloudFlare API on an interval specified in the [config.json](https://github.com/sigmaenigma/CloudFlare/blob/main/DNSRecordUpdate/config.json) file. If you want to run it manually, you can run the `app_manual.py` file.
+The app.py Python file can be used to directly update your CloudFlare DNS record with the IP Address of your home network. After detecting if the IP address that is saved in CloudFlare differs from the detected IP address of the host where the app.py file is running, an update is done in CloudFlare with the new IP4 address for a target DNS record.
+
+By default, the main app `app.py` runs on an interval specified in the [config.json](https://github.com/sigmaenigma/CloudFlare/blob/main/DNSRecordUpdate/config.json) file. If you want to run it manually, you can run the `app_manual.py` file.
 
 # Installation
 1. git clone https://github.com/sigmaenigma/CloudFlare.git
