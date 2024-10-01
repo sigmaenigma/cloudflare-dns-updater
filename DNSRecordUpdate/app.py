@@ -7,7 +7,7 @@ import logging
 
 __author__ = "Adrian Sanabria-Diaz"
 __license__ = "MIT"
-__version__ = "1.0.0"
+__version__ = "2.0.0"
 __maintainer__ = "Adrian Sanabria-Diaz"
 __status__ = "Production"
 
