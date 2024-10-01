@@ -27,4 +27,4 @@ By default, the main app `app.py` runs on an interval specified in the [config.j
 2. `cd DNSRecordUpdate`
 3. Modify the config.json file with your CloudFlare API token, Zone ID, DNS record, and Interval, and if you want to force update
 4. Build the Docker image `docker-compose build`
-5. Run the Docker container `docker-compose up`
+5. Run the Docker container `docker-compose up -d` 
