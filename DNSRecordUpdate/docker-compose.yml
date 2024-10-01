@@ -2,6 +2,7 @@ services:
   cf-dns-updater:
     container_name: cf-dns-updater
     build: .
+    image: cf-dns-updater:latest
     volumes:
       - .:/app
     environment:
