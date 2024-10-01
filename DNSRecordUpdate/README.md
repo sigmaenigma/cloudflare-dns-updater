@@ -14,7 +14,8 @@ By default, the main app `app.py` runs on an interval specified in the [config.j
 # Installation (Python Standalone)
 1. git clone https://github.com/sigmaenigma/CloudFlare.git
 2. Install requests package `pip install requests`
-3. Modify the config.json file with your CloudFlare API token, Zone ID, DNS record, and Interval, and if you want to force update
+3. Navigate to the DNSRecordUpdate directory `cd DNSRecordUpdate`
+4. Modify the config.json file with your CloudFlare API token, Zone ID, DNS record, and Interval, and if you want to force update
 
 ## Running on a timed interval (perpetual)
 `python3 app.py`
@@ -24,7 +25,7 @@ By default, the main app `app.py` runs on an interval specified in the [config.j
 
 # Installation (Docker runs perpetually when started)
 1. git clone https://github.com/sigmaenigma/CloudFlare.git
-2. `cd DNSRecordUpdate`
+2. Navigate to the DNSRecordUpdate directory `cd DNSRecordUpdate`
 3. Modify the config.json file with your CloudFlare API token, Zone ID, DNS record, and Interval, and if you want to force update
 4. Build the Docker image `docker-compose build`
 5. Run the Docker container `docker-compose up -d` 
