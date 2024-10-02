@@ -1,30 +1,66 @@
-# CloudFlare
-The app.py Python file can be used to directly update your CloudFlare DNS record with the IP Address of your home network. After detecting if the IP address that is saved in CloudFlare differs from the detected IP address of the host where the app.py file is running, an update is done in CloudFlare with the new IPV4 address for a target DNS record.
+# CloudFlare DNS Updater
 
-By default, the main app `app.py` runs on an interval specified in the [config.json](https://github.com/sigmaenigma/CloudFlare/blob/main/DNSRecordUpdate/config.json) file. If you want to run it manually, you can run the `app_manual.py` file.
+This Python script updates your CloudFlare DNS record with the IP address of your home network. It detects if the IP address saved in CloudFlare differs from the detected IP address of the host where the script is running and updates CloudFlare with the new IPv4 address for a target DNS record.
 
-## Configuration (config.json)
-1. **"token"**: Get your API token from CloudFlare and make sure the token is able to be used for edits.
-2. **"zone_name"**: Get the Zone ID for the domain. This is a 32 digit alphanumeric string.
-3. **"record_name"**: Add the full subdomain (e.g. test.example.com).
-4. **"force_update"**: Force Update should be set to True if you want to bypass the IP comparison check.
-5. **"interval_minutes"**: Add your interval setting for how often to connect to the CloudFlare API. For example, set to 15 if you want the script to run every 15 minutes.
-7. Save
+By default, the main app `app.py` runs on an interval specified in the `config.json` file. If you want to run it manually, you can run the `app_manual.py` file.
 
-# Installation (Docker runs perpetually when started)
-1. `git clone https://github.com/sigmaenigma/CloudFlare.git`
-2. Navigate to the DNSRecordUpdate directory `cd DNSRecordUpdate`
-3. Modify the [config.json](https://github.com/sigmaenigma/CloudFlare/blob/main/DNSRecordUpdate/config.json) file following the [Configuration](https://github.com/sigmaenigma/CloudFlare/blob/main/DNSRecordUpdate/README.md#configuration-configjson) instructions above
-4. Run `docker-compose up -d` to build and start cf-dns-updater.
+## Prerequisites
+- Python 3.x
+- Docker (for Docker installation)
+- CloudFlare account with API token
 
-# Installation (Python Standalone)
-1. `git clone https://github.com/sigmaenigma/CloudFlare.git`
-2. Install requests package `pip install requests`
-3. Navigate to the DNSRecordUpdate directory `cd DNSRecordUpdate`
-4. Modify the [config.json](https://github.com/sigmaenigma/CloudFlare/blob/main/DNSRecordUpdate/config.json) file following the Configuration instructions above.
+## Configuration (`config.json`)
+1. **"token"**: Get your API token from CloudFlare and ensure it has edit permissions.
+2. **"zone_name"**: Get the Zone ID for the domain (a 32-digit alphanumeric string).
+3. **"record_name"**: Add the full subdomain (e.g., `test.example.com`).
+4. **"force_update"**: Set to `true` to bypass the IP comparison check.
+5. **"interval_minutes"**: Set the interval for how often to connect to the CloudFlare API (e.g., `15` for every 15 minutes).
+6. Save the file.
 
-## Running on a timed interval (perpetual)
-`python3 app.py`
+Example `config.json`:
+```json
+{
+  "token": "your_api_token",
+  "zone_name": "your_zone_id",
+  "record_name": "test.example.com",
+  "force_update": true,
+  "interval_minutes": 15
+}
+```
 
-## Running manually (exits on completion)
-`python3 app_manual.py`
+## Installation (Docker)
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/sigmaenigma/CloudFlare.git
+    cd DNSRecordUpdate
+    ```
+2. Modify the `config.json` file following the [Configuration](https://github.com/sigmaenigma/CloudFlare/blob/main/DNSRecordUpdate/README.md#configuration-configjson) instructions above.
+3. Build and start the Docker container:
+    ```bash
+    docker-compose up -d
+    ```
+
+## Installation (Python Standalone)
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/sigmaenigma/CloudFlare.git
+    ```
+2. Install the `requests` package:
+    ```bash
+    pip install requests
+    ```
+3. Navigate to the DNSRecordUpdate directory:
+    ```bash
+    cd DNSRecordUpdate
+    ```
+4. Modify the `config.json` file following the [Configuration](https://github.com/sigmaenigma/CloudFlare/blob/main/DNSRecordUpdate/README.md#configuration-configjson) instructions above.
+
+## Running on a Timed Interval (Perpetual)
+```bash
+python3 app.py
+```
+
+## Running Manually (Exits on Completion)
+```bash
+python3 app_manual.py
+```
