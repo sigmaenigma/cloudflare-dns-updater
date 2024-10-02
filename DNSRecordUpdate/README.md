@@ -26,5 +26,5 @@ By default, the main app `app.py` runs on an interval specified in the [config.j
 # Installation (Docker runs perpetually when started)
 1. `git clone https://github.com/sigmaenigma/CloudFlare.git`
 2. Navigate to the DNSRecordUpdate directory `cd DNSRecordUpdate`
-3. Modify the [config.json](https://github.com/sigmaenigma/CloudFlare/blob/main/DNSRecordUpdate/config.json) file following the [Configuration]([cf-dns-updater](https://github.com/sigmaenigma/CloudFlare/blob/main/DNSRecordUpdate/README.md#configuration-configjson)) instructions above
+3. Modify the [config.json](https://github.com/sigmaenigma/CloudFlare/blob/main/DNSRecordUpdate/config.json) file following the [Configuration](https://github.com/sigmaenigma/CloudFlare/blob/main/DNSRecordUpdate/README.md#configuration-configjson) instructions above
 4. Run `docker-compose up -d` to build and start cf-dns-updater.
