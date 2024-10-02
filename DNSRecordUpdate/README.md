@@ -11,6 +11,12 @@ By default, the main app `app.py` runs on an interval specified in the [config.j
 5. **"interval_minutes"**: Add your interval setting for how often to connect to the CloudFlare API. For example, set to 15 if you want the script to run every 15 minutes.
 7. Save
 
+# Installation (Docker runs perpetually when started)
+1. `git clone https://github.com/sigmaenigma/CloudFlare.git`
+2. Navigate to the DNSRecordUpdate directory `cd DNSRecordUpdate`
+3. Modify the [config.json](https://github.com/sigmaenigma/CloudFlare/blob/main/DNSRecordUpdate/config.json) file following the [Configuration](https://github.com/sigmaenigma/CloudFlare/blob/main/DNSRecordUpdate/README.md#configuration-configjson) instructions above
+4. Run `docker-compose up -d` to build and start cf-dns-updater.
+
 # Installation (Python Standalone)
 1. `git clone https://github.com/sigmaenigma/CloudFlare.git`
 2. Install requests package `pip install requests`
@@ -22,9 +28,3 @@ By default, the main app `app.py` runs on an interval specified in the [config.j
 
 ## Running manually (exits on completion)
 `python3 app_manual.py`
-
-# Installation (Docker runs perpetually when started)
-1. `git clone https://github.com/sigmaenigma/CloudFlare.git`
-2. Navigate to the DNSRecordUpdate directory `cd DNSRecordUpdate`
-3. Modify the [config.json](https://github.com/sigmaenigma/CloudFlare/blob/main/DNSRecordUpdate/config.json) file following the [Configuration](https://github.com/sigmaenigma/CloudFlare/blob/main/DNSRecordUpdate/README.md#configuration-configjson) instructions above
-4. Run `docker-compose up -d` to build and start cf-dns-updater.
