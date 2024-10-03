@@ -31,7 +31,7 @@ Example `config.json`:
 ## Installation (Docker)
 1. Clone the repository:
     ```bash
-    git clone https://github.com/sigmaenigma/CloudFlare.git
+    git clone https://github.com/sigmaenigma/cloudflare-dns-updater.git
     ```
 2. Modify the `config.json` file following the [Configuration](#configuration-configjson) instructions above.
 3. Build and start the Docker container:
@@ -42,7 +42,7 @@ Example `config.json`:
 ## Installation (Python Standalone)
 1. Clone the repository:
     ```bash
-    git clone https://github.com/sigmaenigma/CloudFlare.git
+    git clone https://github.com/sigmaenigma/cloudflare-dns-updater.git
     ```
 2. Install the `requests` package:
     ```bash
