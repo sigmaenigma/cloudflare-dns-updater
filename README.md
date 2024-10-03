@@ -32,7 +32,6 @@ Example `config.json`:
 1. Clone the repository:
     ```bash
     git clone https://github.com/sigmaenigma/CloudFlare.git
-    cd DNSRecordUpdate
     ```
 2. Modify the `config.json` file following the [Configuration](https://github.com/sigmaenigma/CloudFlare/blob/main/DNSRecordUpdate/README.md#configuration-configjson) instructions above.
 3. Build and start the Docker container:
