@@ -33,7 +33,7 @@ Example `config.json`:
     ```bash
     git clone https://github.com/sigmaenigma/CloudFlare.git
     ```
-2. Modify the `config.json` file following the [Configuration](https://github.com/sigmaenigma/CloudFlare/blob/main/DNSRecordUpdate/README.md#configuration-configjson) instructions above.
+2. Modify the `config.json` file following the [Configuration](#configuration-configjson) instructions above.
 3. Build and start the Docker container:
     ```bash
     docker-compose up -d
@@ -48,11 +48,7 @@ Example `config.json`:
     ```bash
     pip install requests
     ```
-3. Navigate to the DNSRecordUpdate directory:
-    ```bash
-    cd DNSRecordUpdate
-    ```
-4. Modify the `config.json` file following the [Configuration](https://github.com/sigmaenigma/CloudFlare/blob/main/DNSRecordUpdate/README.md#configuration-configjson) instructions above.
+3. Modify the `config.json` file following the [Configuration](#configuration-configjson) instructions above.
 
 ## Running on a Timed Interval (Perpetual)
 ```bash
