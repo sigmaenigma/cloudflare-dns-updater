@@ -2,7 +2,7 @@
 
 This Python script updates your CloudFlare DNS record with the IP address of your home network. It detects if the IP address saved in CloudFlare differs from the detected IP address of the host where the script is running and updates CloudFlare with the new IPv4 address for a target DNS record.
 
-By default, the main app `app.py` runs on an interval specified in the `config.json` file. If you want to run it manually, you can run the `app_manual.py` file.
+By default, the main app `app.py` runs on an interval specified in the `config.json` file. If you want to run it manually, you can run the `app_manual.py` file which exists upon completion.
 
 ## Prerequisites
 - Python 3.x (_If running manually and not using Docker_)
