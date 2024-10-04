@@ -1,5 +1,3 @@
-version: "3"
-
 # More information at https://github.com/sigmaenigma/CloudFlare/blob/main/DNSRecordUpdate/README.md
 services:
   cf-dns-updater:
