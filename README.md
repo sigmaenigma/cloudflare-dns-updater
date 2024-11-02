@@ -5,7 +5,7 @@ This Python script updates your CloudFlare DNS record with the IP address of you
 By default, the main app `app.py` runs on an interval specified in the `config.json` file. If you want to run it manually, you can run the `app_manual.py` file which exists upon completion.
 
 ## Prerequisites
-- Python 3.x (_If running manually and not using Docker_)
+- Python 3.x (_If running manually and not using Docker since the Docker setup uses the Python 3.9-Slim image_)
 - Docker (for Docker installation) [Docker Website](https://www.docker.com/)
 - CloudFlare account with API token [CloudFlare Instructions to Create a Token](https://developers.cloudflare.com/fundamentals/api/get-started/create-token)
 
