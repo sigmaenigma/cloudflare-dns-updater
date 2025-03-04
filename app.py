@@ -8,7 +8,7 @@ import time
 
 __author__ = "Adrian Sanabria-Diaz"
 __license__ = "MIT"
-__version__ = "2.1.0"
+__version__ = "2.1.1"
 __maintainer__ = "Adrian Sanabria-Diaz"
 __status__ = "Production"
 
@@ -62,7 +62,8 @@ class CloudFlareUpdater:
 
     def get_current_public_ip(self):
         try:
-            return requests.get('https://api.ipify.org').text
+            current_ip = requests.get('https://api.ipify.org').text
+            return current_ip
         except Exception as e:
             logging.error(f'Error getting current public IP: {e}')
             raise
@@ -70,15 +71,11 @@ class CloudFlareUpdater:
     def get_zone_data(self):
         try:
             zone_id = self.config.get('zone_id')
-            logging.info(f'Zone ID: {zone_id}')
             dns_record_name = self.config.get('dns_record_name')
             url = f"https://api.cloudflare.com/client/v4/zones/{zone_id}/dns_records?name={dns_record_name}"
             response = requests.get(url=url, headers=self.headers)
             response.raise_for_status()
-            if response.status_code == 200:
-                print(f'Zone Data Retrieved')
             result = response.json().get('result', [])[0]
-            logging.info(f'Zone Data Result: {result}')
             return result
         except Exception as e:
             logging.error(f'Error getting zone data: {e}')
@@ -90,8 +87,8 @@ class CloudFlareUpdater:
             if current_public_ip != cloudflare_ip or self.config.get("force_update"):
                 logging.info(f'Updating CloudFlare IP from {cloudflare_ip} to {current_public_ip}')
                 zone_id = self.config.get('zone_id')
-                zd_id = zone_data['id']
-                url = f"https://api.cloudflare.com/client/v4/zones/{zone_id}/dns_records/{zd_id}"
+                id = zone_data['id']
+                url = f"https://api.cloudflare.com/client/v4/zones/{zone_id}/dns_records/{id}"
                 payload = {
                     "content": current_public_ip,
                     "name": zone_data["name"],
