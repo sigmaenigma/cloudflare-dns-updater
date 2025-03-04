@@ -21,8 +21,8 @@ Example `config.json`:
 ```json
 {
   "token": "your_api_token",
-  "zone_name": "your_zone_id",
-  "record_name": "test.example.com",
+  "zone_id": "your_zone_id",
+  "dns_record_name": "test.example.com",
   "force_update": true,
   "interval_minutes": 15
 }
