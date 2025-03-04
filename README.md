@@ -11,8 +11,8 @@ By default, the main app `app.py` runs on an interval specified in the `config.j
 
 ## Configuration (`config.json`)
 1. **"token"**: Get your API token from CloudFlare and ensure it has edit permissions. 
-2. **"zone_name"**: Get the Zone ID for the domain (a 32-digit alphanumeric string).
-3. **"record_name"**: Add the full subdomain (e.g., `test.example.com`).
+2. **"zone_id"**: Get the Zone ID for the domain (a 32-digit alphanumeric string).
+3. **"dns_record_name"**: Add the full subdomain (e.g., `test.example.com`).
 4. **"force_update"**: Set to `true` to bypass the IP comparison check.
 5. **"interval_minutes"**: Set the interval for how often to connect to the CloudFlare API (e.g., `15` for every 15 minutes).
 6. Save the file.
