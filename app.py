@@ -1,127 +1,227 @@
 #!/usr/bin/env python3
-import requests
+"""Keep a Cloudflare A record pointed at this host's current public IPv4 address.
+
+Run this file directly for a perpetual loop that checks on an interval, or run
+app_manual.py for a single check that exits.
+"""
+import ipaddress
 import json
-from datetime import datetime
-import socket
 import logging
+import os
+import socket
+import sys
 import time
+from datetime import datetime, timezone
+from pathlib import Path
+
+import requests
 
 __author__ = "Adrian Sanabria-Diaz"
 __license__ = "MIT"
-__version__ = "2.1.1"
+__version__ = "3.0.0"
 __maintainer__ = "Adrian Sanabria-Diaz"
 __status__ = "Production"
 
-logging.basicConfig(level=logging.INFO)
+CLOUDFLARE_API = "https://api.cloudflare.com/client/v4"
+PUBLIC_IP_URL = "https://api.ipify.org"
+REQUEST_TIMEOUT = 10  # seconds; requests has no default and would hang forever
+COMMENT_MAX_LEN = 100  # Cloudflare's limit for DNS record comments
+DEFAULT_INTERVAL_MINUTES = 15
+
+log = logging.getLogger("cloudflare-dns-updater")
+
+
+def configure_logging():
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s %(levelname)s %(message)s",
+    )
+
+
+class ConfigError(Exception):
+    """Raised when the config file is missing, unreadable, or incomplete."""
+
 
 class Config:
-    def __init__(self, config_file='config.json'):
-        self.config = self.load_config(config_file)
+    """Settings from config.json. CF_API_TOKEN in the environment overrides "token"."""
 
-    def load_config(self, config_file):
+    def __init__(self, config_file=None):
+        self.path = Path(
+            config_file
+            or os.environ.get("CONFIG_FILE")
+            or Path(__file__).resolve().parent / "config.json"
+        )
+        data = self._read(self.path)
+        self.token = os.environ.get("CF_API_TOKEN") or data.get("token")
+        self.zone_id = data.get("zone_id")
+        self.dns_record_name = data.get("dns_record_name")
+        self.force_update = bool(data.get("force_update", False))
+        self.interval_minutes = data.get("interval_minutes", DEFAULT_INTERVAL_MINUTES)
+        self._validate()
+
+    @staticmethod
+    def _read(path):
         try:
-            with open(config_file, 'r') as f:
-                return json.load(f)
-        except Exception as e:
-            logging.error(f'Error loading config file: {e}')
-            raise
+            with open(path, encoding="utf-8") as f:
+                data = json.load(f)
+        except FileNotFoundError:
+            raise ConfigError(
+                f"Config file not found: {path}. "
+                "Copy config.example.json to config.json and fill it in."
+            ) from None
+        except OSError as e:
+            raise ConfigError(f"Could not read config file {path}: {e}") from None
+        except json.JSONDecodeError as e:
+            raise ConfigError(f"Config file {path} is not valid JSON: {e}") from None
+        if not isinstance(data, dict):
+            raise ConfigError(f"Config file {path} must contain a JSON object")
+        return data
 
-    def get(self, key):
-        return self.config.get(key)
+    def _validate(self):
+        problems = []
+        if not isinstance(self.token, str) or not self.token.strip():
+            problems.append(
+                '"token" is required: set it in the config file '
+                "or in the CF_API_TOKEN environment variable"
+            )
+        for name in ("zone_id", "dns_record_name"):
+            value = getattr(self, name)
+            if not isinstance(value, str) or not value.strip():
+                problems.append(f'"{name}" is required and must be a non-empty string')
+        interval = self.interval_minutes
+        if (
+            isinstance(interval, bool)
+            or not isinstance(interval, (int, float))
+            or interval <= 0
+        ):
+            problems.append('"interval_minutes" must be a positive number')
+        if problems:
+            raise ConfigError("Invalid configuration: " + "; ".join(problems))
+
 
 class CloudFlareUpdater:
     def __init__(self, config):
         self.config = config
-        self.headers = self.get_headers()
+        self.session = requests.Session()
+        self.session.headers["Authorization"] = f"Bearer {config.token}"
 
-    def get_headers(self):
-        try:
-            token = self.config.get('token')
-            return {
-                "Authorization": f"Bearer {token}",
-                "Content-Type": "application/json"
-            }
-        except Exception as e:
-            logging.error(f'Error getting headers: {e}')
-            raise
+    def _cloudflare(self, method, path, **kwargs):
+        """Call the Cloudflare API and return the parsed "result" field.
 
-    def verify_api(self):
+        Raises requests.HTTPError with Cloudflare's own error messages on failure.
+        """
+        response = self.session.request(
+            method, f"{CLOUDFLARE_API}{path}", timeout=REQUEST_TIMEOUT, **kwargs
+        )
         try:
-            url = "https://api.cloudflare.com/client/v4/user/tokens/verify"
-            response = requests.get(url=url, headers=self.headers)
-            response.raise_for_status()
-            response.json().get('result', {}).get('status') == 'active'
-            if response.json().get('result', {}).get('status') == 'active':
-                logging.info(f'API connection is successful')
-                return True
-            else:
-                return False
-        except Exception as e:
-            logging.error(f'Error verifying API token: {e}')
+            body = response.json()
+        except ValueError:
+            body = {}
+        if not response.ok or not body.get("success", False):
+            errors = "; ".join(
+                f"{e.get('code')}: {e.get('message')}" for e in body.get("errors", [])
+            )
+            raise requests.HTTPError(
+                f"Cloudflare API {method} {path} failed with HTTP "
+                f"{response.status_code}: {errors or response.text[:200]}",
+                response=response,
+            )
+        return body.get("result")
+
+    def verify_token(self):
+        """Return True if the configured token is valid and active."""
+        try:
+            result = self._cloudflare("GET", "/user/tokens/verify") or {}
+        except requests.RequestException as e:
+            log.error("Could not verify API token: %s", e)
             return False
+        status = result.get("status")
+        if status != "active":
+            log.error("API token status is %r, expected 'active'", status)
+            return False
+        log.info("API token verified")
+        return True
 
     def get_current_public_ip(self):
+        response = requests.get(PUBLIC_IP_URL, timeout=REQUEST_TIMEOUT)
+        response.raise_for_status()
+        text = response.text.strip()
         try:
-            current_ip = requests.get('https://api.ipify.org').text
-            return current_ip
-        except Exception as e:
-            logging.error(f'Error getting current public IP: {e}')
-            raise
+            return str(ipaddress.IPv4Address(text))
+        except ipaddress.AddressValueError:
+            raise ValueError(
+                f"Public IP lookup did not return an IPv4 address: {text[:100]!r}"
+            ) from None
 
-    def get_zone_data(self):
-        try:
-            zone_id = self.config.get('zone_id')
-            dns_record_name = self.config.get('dns_record_name')
-            url = f"https://api.cloudflare.com/client/v4/zones/{zone_id}/dns_records?name={dns_record_name}"
-            response = requests.get(url=url, headers=self.headers)
-            response.raise_for_status()
-            result = response.json().get('result', [])[0]
-            return result
-        except Exception as e:
-            logging.error(f'Error getting zone data: {e}')
-            raise
+    def get_dns_record(self):
+        name = self.config.dns_record_name
+        records = self._cloudflare(
+            "GET",
+            f"/zones/{self.config.zone_id}/dns_records",
+            params={"name": name, "type": "A"},
+        ) or []
+        if not records:
+            raise LookupError(
+                f"No A record named {name!r} exists in zone {self.config.zone_id}. "
+                "Create it in Cloudflare first; this script only updates records."
+            )
+        if len(records) > 1:
+            log.warning("Found %d A records named %s; updating the first", len(records), name)
+        return records[0]
 
-    def update_ip_in_cloudflare(self, current_public_ip, zone_data):
-        try:
-            cloudflare_ip = zone_data["content"]
-            if current_public_ip != cloudflare_ip or self.config.get("force_update"):
-                logging.info(f'Updating CloudFlare IP from {cloudflare_ip} to {current_public_ip}')
-                zone_id = self.config.get('zone_id')
-                id = zone_data['id']
-                url = f"https://api.cloudflare.com/client/v4/zones/{zone_id}/dns_records/{id}"
-                payload = {
-                    "content": current_public_ip,
-                    "name": zone_data["name"],
-                    "proxied": False,
-                    "type": "A",
-                    "comment": f"IP last updated on {datetime.now()} via API User from hostname {socket.gethostname()}",
-                    "ttl": 3600
-                }
-                response = requests.patch(url=url, json=payload, headers=self.headers)
-                response.raise_for_status()
-                logging.info('IP successfully updated in CloudFlare')
-            else:
-                logging.info('IP addresses are the same. No update needed.')
-        except Exception as e:
-            logging.error(f'Error updating IP in CloudFlare: {e}')
-            raise
+    def update_dns_record(self, current_ip, record):
+        """PATCH the record's content if it differs. Returns True if an update was sent.
+
+        Only "content" and "comment" are sent, so proxied status and TTL are preserved.
+        """
+        if current_ip == record["content"] and not self.config.force_update:
+            log.info("Cloudflare already has %s. No update needed.", current_ip)
+            return False
+        log.info("Updating %s from %s to %s", record["name"], record["content"], current_ip)
+        stamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+        comment = f"Updated {stamp} by cloudflare-dns-updater on {socket.gethostname()}"
+        self._cloudflare(
+            "PATCH",
+            f"/zones/{self.config.zone_id}/dns_records/{record['id']}",
+            json={"content": current_ip, "comment": comment[:COMMENT_MAX_LEN]},
+        )
+        log.info("Record updated successfully")
+        return True
+
+    def run_once(self):
+        """One full check-and-update cycle. Raises on any failure."""
+        current_ip = self.get_current_public_ip()
+        record = self.get_dns_record()
+        return self.update_dns_record(current_ip, record)
+
 
 def main():
+    configure_logging()
     try:
         config = Config()
-        updater = CloudFlareUpdater(config)
-        interval_minutes = config.get('interval_minutes')
-        while True:
-            if updater.verify_api():
-                current_public_ip = updater.get_current_public_ip()
-                zone_data = updater.get_zone_data()
-                updater.update_ip_in_cloudflare(current_public_ip, zone_data)
-            else:
-                logging.error('API token verification failed.')
-            logging.info(f'Waiting for {interval_minutes} minutes before next update...')
-            time.sleep(interval_minutes * 60)
-    except Exception as e:
-        logging.error(f'Error in main: {e}')
+    except ConfigError as e:
+        log.error("%s", e)
+        return 1
 
-if __name__ == '__main__':
-    main()
+    updater = CloudFlareUpdater(config)
+    if not updater.verify_token():
+        return 1
+
+    log.info(
+        "Watching %s every %s minute(s)", config.dns_record_name, config.interval_minutes
+    )
+    try:
+        while True:
+            try:
+                updater.run_once()
+            except Exception as e:  # noqa: BLE001 - keep the daemon alive through transient failures
+                log.error("Update cycle failed: %s", e)
+            log.info("Next check in %s minute(s)", config.interval_minutes)
+            time.sleep(config.interval_minutes * 60)
+    except KeyboardInterrupt:
+        log.info("Stopping")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

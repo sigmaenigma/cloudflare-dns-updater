@@ -1,7 +1,0 @@
-{
-    "zone_id": "1234567890ABCDEFGHIJKLMNOPQRSTUV",
-    "dns_record_name": "home.example.com",
-    "token": "1234567890ABCDEFGHIJKLMNOPQRSTUV",
-    "force_update":true,
-    "interval_minutes":15
-}

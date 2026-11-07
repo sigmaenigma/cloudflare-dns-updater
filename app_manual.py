@@ -1,27 +1,35 @@
 #!/usr/bin/env python3
-from app import Config, CloudFlareUpdater
-import logging
+"""Run a single check-and-update cycle and exit. Exits non-zero on failure."""
+import sys
+
+from app import CloudFlareUpdater, Config, ConfigError, configure_logging, log
 
 __author__ = "Adrian Sanabria-Diaz"
 __license__ = "MIT"
-__version__ = "2.0.1"
+__version__ = "3.0.0"
 __maintainer__ = "Adrian Sanabria-Diaz"
 __status__ = "Production"
 
-logging.basicConfig(level=logging.INFO)
 
 def main():
+    configure_logging()
     try:
         config = Config()
-        updater = CloudFlareUpdater(config)
-        if updater.verify_api():
-            current_public_ip = updater.get_current_public_ip()
-            zone_data = updater.get_zone_data()
-            updater.update_ip_in_cloudflare(current_public_ip, zone_data)
-        else:
-            logging.error('API token verification failed.')
-    except Exception as e:
-        logging.error(f'Error in manual_app: {e}')
+    except ConfigError as e:
+        log.error("%s", e)
+        return 1
 
-if __name__ == '__main__':
-    main()
+    updater = CloudFlareUpdater(config)
+    if not updater.verify_token():
+        return 1
+
+    try:
+        updater.run_once()
+    except Exception as e:  # noqa: BLE001 - report any failure as a non-zero exit
+        log.error("Update failed: %s", e)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -1,13 +1,13 @@
-# More information at https://github.com/sigmaenigma/CloudFlare/blob/main/DNSRecordUpdate/README.md
+# Setup instructions are in README.md
 services:
   cf-dns-updater:
     container_name: cf-dns-updater
-    image: python:3.9-slim
+    build: .
     volumes:
-      - .:/app
-    working_dir: /app
-    # The command installs the necessary requirements and then runs the Python app
-    command: sh -c "pip install --no-cache-dir -r requirements.txt && python app.py"
+      # Copy config.example.json to config.json and fill it in before starting.
+      - ./config.json:/app/config.json:ro
     environment:
-      - CONFIG_FILE=config.json
-    restart: always
+      - CONFIG_FILE=/app/config.json
+      # Optional: supply the token here (or via a .env file) instead of in config.json.
+      # - CF_API_TOKEN=${CF_API_TOKEN}
+    restart: unless-stopped

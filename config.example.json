@@ -1,0 +1,7 @@
+{
+    "zone_id": "your_zone_id",
+    "dns_record_name": "home.example.com",
+    "token": "your_api_token",
+    "force_update": false,
+    "interval_minutes": 15
+}
